@@ -1,0 +1,65 @@
+<div class="container py-5">
+  <h2 class="text-center mb-5 fw-bold">Liste des suggestions</h2>
+
+  <!-- Barre de recherche -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-lg-6">
+      <input type="text" class="form-control form-control-lg rounded-pill shadow-sm"
+             placeholder="Rechercher une suggestion"
+             [(ngModel)]="searchTerm">
+    </div>
+  </div>
+
+  <!-- Cartes des suggestions -->
+  <div class="row justify-content-center g-5">
+    <div class="col-lg-8" *ngFor="let s of filteredSuggestions">
+      <div class="card border-0 shadow-sm" style="border-radius: 25px;">
+        <div class="card-body p-5">
+
+          <h5 class="fw-bold text-primary mb-3">{{ s.title }}</h5>
+          <p class="text-muted small mb-3">
+            {{ s.category }} • {{ s.date | date:'dd MMM yyyy' : '' : 'fr' }}
+          </p>
+          <p class="text-secondary mb-4">{{ s.description }}</p>
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <!-- Badge statut -->
+            <span class="badge rounded-pill px-4 py-2 fw-bold fs-6"
+                  [ngClass]="{
+                    'bg-success text-white': s.status === 'acceptee',
+                    'bg-danger-subtle text-danger': s.status === 'refusee',
+                    'bg-warning-subtle text-dark': s.status === 'en_attente'
+                  }">
+              {{ s.status === 'acceptee' ? 'ACCEPTÉE' : s.status === 'refusee' ? 'REFUSÉE' : 'EN ATTENTE' }}
+            </span>
+
+            <!-- Boutons Like & Favoris → CACHÉS si status = refusee -->
+            <div class="d-flex gap-3" *ngIf="s.status !== 'refusee'">
+              <button class="btn btn-warning shadow-sm d-flex align-items-center gap-2"
+                      (click)="likeSuggestion(s)">
+                Like {{ s.likes || 0 }}
+              </button>
+              <button class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2"
+                      (click)="addToFavorites(s)"
+                      [disabled]="s.isFavorite">
+                {{ s.isFavorite ? 'Ajoutée' : 'Ajouter aux favoris' }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Favoris -->
+  <div class="text-center mt-5" *ngIf="favorites.length > 0">
+    <h4 class="text-primary mb-4">Mes favoris ({{ favorites.length }})</h4>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <div class="badge bg-light text-dark p-3 fs-6" *ngFor="let f of favorites">
+        {{ f.title }}
+      </div>
+    </div>
+  </div>
+</div>
