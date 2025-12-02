@@ -1,0 +1,34 @@
+<div class="container mt-4">
+  <h2>Liste des suggestions</h2>
+
+  <div class="input-group mb-4">
+    <input type="text" class="form-control" placeholder="Rechercher..." [(ngModel)]="searchTerm" (keyup.enter)="search()">
+    <button class="btn btn-primary" (click)="search()">Rechercher</button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3" *ngFor="let suggestion of filteredSuggestions">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ suggestion.title }}</h5>
+          <p class="card-text">{{ suggestion.description }}</p>
+          <p><strong>{{ suggestion.category }}</strong> • {{ suggestion.date | date:'dd/MM/yyyy' }}</p>
+          <span class="badge"
+            [ngClass]="{'bg-success': suggestion.status==='acceptee', 'bg-danger': suggestion.status==='refusee', 'bg-warning': suggestion.status==='en_attente'}">
+            {{ suggestion.status }}
+          </span>
+        </div>
+        <div class="card-footer" *ngIf="suggestion.status !== 'refusee'">
+          <button class="btn btn-outline-primary btn-sm me-2" (click)="like(suggestion)">
+            Like {{ suggestion.likes || 0 }}
+          </button>
+          <button class="btn btn-outline-danger btn-sm me-2" (click)="toggleFavorite(suggestion.id)">
+            <span *ngIf="favorites.includes(suggestion.id); else notFav">Favori</span>
+            <ng-template #notFav>Ajouter aux favoris</ng-template>
+          </button>
+          <a [routerLink]="[suggestion.id]" class="btn btn-info btn-sm">Détails</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

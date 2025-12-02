@@ -34,32 +34,31 @@
               {{ s.status === 'acceptee' ? 'ACCEPTÉE' : s.status === 'refusee' ? 'REFUSÉE' : 'EN ATTENTE' }}
             </span>
 
-            <!-- Boutons Like & Favoris → CACHÉS si status = refusee -->
-            <div class="d-flex gap-3" *ngIf="s.status !== 'refusee'">
-              <button class="btn btn-warning shadow-sm d-flex align-items-center gap-2"
-                      (click)="likeSuggestion(s)">
-                Like {{ s.likes || 0 }}
-              </button>
-              <button class="btn btn-outline-secondary shadow-sm d-flex align-items-center gap-2"
-                      (click)="addToFavorites(s)"
-                      [disabled]="s.isFavorite">
-                {{ s.isFavorite ? 'Ajoutée' : 'Ajouter aux favoris' }}
-              </button>
-            </div>
+           <div class="card-footer" *ngIf="suggestion.status !== 'refusee'">
+  <button class="btn btn-outline-primary btn-sm me-2" (click)="like(suggestion)">
+    Like {{ suggestion.likes || 0 }}
+  </button>
+  <button class="btn btn-outline-danger btn-sm me-2" (click)="toggleFavorite(suggestion.id)">
+    Favoris
+  </button>
+  <a [routerLink]="[suggestion.id]" class="btn btn-info btn-sm me-2">
+    Détails
+  </a>
+</div>
 
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Section Favoris -->
-  <div class="text-center mt-5" *ngIf="favorites.length > 0">
-    <h4 class="text-primary mb-4">Mes favoris ({{ favorites.length }})</h4>
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <div class="badge bg-light text-dark p-3 fs-6" *ngFor="let f of favorites">
-        {{ f.title }}
-      </div>
-    </div>
-  </div>
+<!-- BOUTONS ADMIN : visibles tout le temps (même si refusée) -->
+<div class="mt-2">
+  <small class="text-muted">Admin : changer le statut →</small><br>
+  <button class="btn btn-success btn-sm me-2" (click)="setStatus(suggestion.id, 'acceptee')"
+          [class.active]="suggestion.status === 'acceptee'">
+    Acceptée
+  </button>
+  <button class="btn btn-danger btn-sm me-2" (click)="setStatus(suggestion.id, 'refusee')"
+          [class.active]="suggestion.status === 'refusee'">
+    Refusée
+  </button>
+  <button class="btn btn-warning btn-sm text-dark" (click)="setStatus(suggestion.id, 'en_attente')"
+          [class.active]="suggestion.status === 'en_attente'">
+    En attente
+  </button>
 </div>

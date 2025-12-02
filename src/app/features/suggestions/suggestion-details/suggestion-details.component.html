@@ -1,0 +1,22 @@
+<div class="container mt-5" *ngIf="suggestion">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h3>{{ suggestion.title }}</h3>
+      <small>{{ suggestion.category }} • {{ suggestion.date | date:'fullDate' }}</small>
+    </div>
+    <div class="card-body">
+      <p><strong>Description :</strong></p>
+      <p class="lead">{{ suggestion.description }}</p>
+      <p><strong>Statut :</strong>
+        <span class="badge bg-success" *ngIf="suggestion.status === 'acceptee'">Acceptée</span>
+        <span class="badge bg-danger" *ngIf="suggestion.status === 'refusee'">Refusée</span>
+        <span class="badge bg-warning" *ngIf="suggestion.status === 'en_attente'">En attente</span>
+      </p>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-secondary" (click)="goBack()">
+        Back to list
+      </button>
+    </div>
+  </div>
+</div>
