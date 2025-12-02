@@ -26,9 +26,10 @@
             <span *ngIf="favorites.includes(suggestion.id); else notFav">Favori</span>
             <ng-template #notFav>Ajouter aux favoris</ng-template>
           </button>
-          <a [routerLink]="[suggestion.id]" class="btn btn-info btn-sm">Détails</a>
+          <a [routerLink]="[suggestion.id]" class="btn btn-info btn-sm">Détail
+          </a>
         </div>
       </div>
     </div>
+   </div>
   </div>
-</div>
