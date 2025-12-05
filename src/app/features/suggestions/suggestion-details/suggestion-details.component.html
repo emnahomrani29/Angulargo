@@ -1,22 +1,61 @@
-<div class="container mt-5" *ngIf="suggestion">
-  <div class="card shadow">
+<div class="container mt-5">
+  <div class="card shadow" *ngIf="suggestion">
+    
     <div class="card-header bg-primary text-white">
-      <h3>{{ suggestion.title }}</h3>
-      <small>{{ suggestion.category }} • {{ suggestion.date | date:'fullDate' }}</small>
+      <h3 class="mb-0">{{ suggestion.title }}</h3>
+      <small>
+        {{ suggestion.category }} • {{ suggestion.date | date:'fullDate' }}
+      </small>
     </div>
+    
     <div class="card-body">
+      
       <p><strong>Description :</strong></p>
       <p class="lead">{{ suggestion.description }}</p>
+
       <p><strong>Statut :</strong>
-        <span class="badge bg-success" *ngIf="suggestion.status === 'acceptee'">Acceptée</span>
-        <span class="badge bg-danger" *ngIf="suggestion.status === 'refusee'">Refusée</span>
-        <span class="badge bg-warning" *ngIf="suggestion.status === 'en_attente'">En attente</span>
+        <span class="badge" 
+              [ngClass]="{
+                'bg-success': suggestion.status === 'acceptee',
+                'bg-danger': suggestion.status === 'refusee',
+                'bg-warning': suggestion.status === 'en_attente'
+              }">
+          {{ suggestion.status | titlecase }}
+        </span>
       </p>
+
+      <hr>
+
+      <div class="d-flex justify-content-between">
+        
+        <button 
+          [routerLink]="['/suggestions', previousSuggestionId]" 
+          [disabled]="!previousSuggestionId"
+          class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Précédent
+        </button>
+        
+        <button 
+          [routerLink]="['/suggestions', nextSuggestionId]" 
+          [disabled]="!nextSuggestionId"
+          class="btn btn-outline-secondary ms-auto">
+          Suivant <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+
     </div>
-    <div class="card-footer">
-      <button class="btn btn-secondary" (click)="goBack()">
-        Back to list
-      </button>
+    
+    <div class="card-footer d-flex justify-content-start">
+      <a [routerLink]="['/suggestions']" class="btn btn-secondary">
+        ← Retour à la liste
+      </a>
     </div>
+
+  </div>
+
+  <div class="alert alert-warning" role="alert" *ngIf="!suggestion">
+    <h4 class="alert-heading">Suggestion non trouvée</h4>
+    <p>Désolé, aucune suggestion ne correspond à l'identifiant demandé.</p>
+    <a [routerLink]="['/suggestions']" class="btn btn-warning">Retour à la liste des suggestions</a>
   </div>
 </div>

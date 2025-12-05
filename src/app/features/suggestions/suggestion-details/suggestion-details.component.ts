@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router'; // Ajout de Router pour la navigation
+import { Subscription } from 'rxjs'; // Ajout de Subscription pour la propreté
 import { Suggestion } from '../../../models/suggestion';
 
 @Component({
@@ -7,12 +8,16 @@ import { Suggestion } from '../../../models/suggestion';
   templateUrl: './suggestion-details.component.html',
   styleUrl: './suggestion-details.component.css'
 })
-export class SuggestionDetailsComponent implements OnInit {
+// Implémente OnDestroy pour nettoyer les souscriptions (bonne pratique)
+export class SuggestionDetailsComponent implements OnInit, OnDestroy {
 
-  // La propriété qui manquait → c’est ça qui déclenchait l’erreur
   suggestion!: Suggestion;
-
-  // Liste statique exactement comme dans le Workshop 2
+  
+  // PROPRIÉTÉS MANQUANTES CAUSANT LES ERREURS :
+  currentSuggestionIndex: number = -1;
+  routeSubscription: Subscription | undefined;
+  
+  // Liste statique (simule le service pour le moment)
   private suggestions: Suggestion[] = [
     {
       id: 1,
@@ -56,23 +61,66 @@ export class SuggestionDetailsComponent implements OnInit {
     }
   ];
 
-  constructor(private route: ActivatedRoute) { }
+  // Injection du Router (non utilisé mais utile si 'goBack' était conservé)
+  constructor(private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
-    // Récupération de l'id depuis l'URL
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    // ⚠️ IMPORTANT : Utiliser paramMap.subscribe() pour être réactif aux changements d'ID (navigation Précédent/Suivant)
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam) {
+        const id = Number(idParam);
+        this.loadSuggestionDetails(id);
+      }
+    });
+  }
 
-    // Recherche de la suggestion correspondante
-    this.suggestion = this.suggestions.find(s => s.id === id)!;
+  // Fonction pour charger les détails et mettre à jour l'index
+  loadSuggestionDetails(id: number): void {
+    // 1. Recherche de la suggestion correspondante
+    const foundSuggestion = this.suggestions.find(s => s.id === id);
 
-    // Optionnel : gestion si pas trouvé
-    if (!this.suggestion) {
+    if (foundSuggestion) {
+      this.suggestion = foundSuggestion;
+      
+      // 2. Mise à jour de l'index
+      this.currentSuggestionIndex = this.suggestions.findIndex(s => s.id === id);
+    } else {
+      // Gérer le cas où la suggestion n'est pas trouvée
+      this.suggestion = undefined as any; // Cast pour désactiver l'affichage dans le template
+      this.currentSuggestionIndex = -1;
       console.error('Suggestion non trouvée pour l\'id', id);
     }
   }
 
-  // Bouton "Retour à la liste"
-  goBack(): void {
-    window.history.back();
+  // Accesseur pour obtenir l'ID de la suggestion suivante
+  get nextSuggestionId(): number | undefined {
+    // Si l'index actuel n'est pas le dernier de la liste
+    if (this.currentSuggestionIndex !== -1 && this.currentSuggestionIndex < this.suggestions.length - 1) {
+      return this.suggestions[this.currentSuggestionIndex + 1].id;
+    }
+    return undefined; // Pas de suggestion suivante
   }
+
+  // Accesseur pour obtenir l'ID de la suggestion précédente
+  get previousSuggestionId(): number | undefined {
+    // Si l'index actuel n'est pas le premier de la liste
+    if (this.currentSuggestionIndex > 0) {
+      return this.suggestions[this.currentSuggestionIndex - 1].id;
+    }
+    return undefined; // Pas de suggestion précédente
+  }
+
+  // Méthode de nettoyage (OnDestroy)
+  ngOnDestroy(): void {
+    if (this.routeSubscription) {
+      // Nettoie l'abonnement pour éviter les fuites de mémoire (très important !)
+      this.routeSubscription.unsubscribe();
+    }
+  }
+
+  // La méthode 'goBack()' n'est plus strictement nécessaire si vous utilisez routerLink dans le template
+  // goBack(): void {
+  //   window.history.back();
+  // }
 }
